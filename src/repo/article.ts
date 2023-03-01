@@ -1,3 +1,4 @@
+import { CategoryInterface, CategoryModel } from "./../model/category";
 import { Types } from "mongoose";
 import { CommentModel, CommentInterface } from "./../model/comment";
 import { LikeModel, LikeInterface } from "./../model/like";
@@ -18,18 +19,21 @@ export interface ArticleRepoInterface {
     articleId: string,
     isLike: boolean
   ): Promise<LikeInterface>;
-  count(userId: string): Promise<number>;
+  count(): Promise<number>;
+  getCategoryById(categoryId: string): Promise<CategoryInterface | null>;
 }
 
 export class ArticleRepo implements ArticleRepoInterface {
   constructor(
     public articleModel: typeof ArticleModel,
     public commentModel: typeof CommentModel,
-    public likeModel: typeof LikeModel
+    public likeModel: typeof LikeModel,
+    public categoryModel: typeof CategoryModel
   ) {
     this.articleModel = articleModel;
     this.commentModel = commentModel;
     this.likeModel = likeModel;
+    this.categoryModel = categoryModel;
   }
 
   public async create(article: ArticleInterface): Promise<ArticleInterface> {
@@ -50,6 +54,10 @@ export class ArticleRepo implements ArticleRepoInterface {
 
   public async getById(articleId: string): Promise<ArticleInterface | null> {
     return this.articleModel.findById({ _id: articleId }).populate("category");
+  }
+
+  public async getCategoryById(categoryId: string): Promise<CategoryInterface | null> {
+    return this.categoryModel.findById({ _id: categoryId });
   }
 
   public async count(): Promise<number> {
@@ -99,9 +107,10 @@ export class ArticleRepo implements ArticleRepoInterface {
 export const newArticleRepo = async (
   articleModel: typeof ArticleModel,
   commentModel: typeof CommentModel,
-  likeModel: typeof LikeModel
+  likeModel: typeof LikeModel,
+  categoryModel: typeof CategoryModel
 ): Promise<ArticleRepoInterface> => {
-  return new ArticleRepo(articleModel, commentModel, likeModel);
+  return new ArticleRepo(articleModel, commentModel, likeModel, categoryModel);
 };
 
 export default ArticleRepo;
