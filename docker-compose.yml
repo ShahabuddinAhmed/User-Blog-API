@@ -1,0 +1,26 @@
+version: "3"
+services:
+  web:
+    container_name: userBlogService
+    build:
+      dockerfile: Dockerfile.dev
+      context: .
+    depends_on:
+      - db
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/server
+    environment:
+      - MONGO_HOST=mongodb://db:27017
+      - MONGO_DB=userBlog
+      - APPLICATION_SERVER_PORT=3000
+      - APP_FORCE_SHUTDOWN_SECOND=30
+
+  # Database
+  db:
+    container_name: userBlogServiceMongo
+    image: mongo
+    ports:
+      - "27017:27017"
+    restart: always
