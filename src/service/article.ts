@@ -1,3 +1,6 @@
+import { CommentInterface } from "./../model/comment";
+import { LikeInterface } from "../model/like";
+import { CategoryInterface } from "../model/category";
 import { ArticleInterface } from "../model/article";
 import { UserRepoInterface } from "../repo/user";
 import { ArticleRepoInterface } from "../repo/article";
@@ -12,6 +15,15 @@ export interface ArticleServiceInterface {
     articleId: string
   ): Promise<{ article: ArticleInterface | null; errMessage: string }>;
   count(): Promise<number>;
+  leaveComment(
+    comment: CommentInterface
+  ): Promise<{ comment: CommentInterface | null; errMessage: string }>;
+  createCategory(
+    category: CategoryInterface
+  ): Promise<{ category: CategoryInterface | null; errMessage: string }>;
+  addLike(
+    like: LikeInterface
+  ): Promise<{ like: LikeInterface | null; errMessage: string }>;
 }
 
 export class ArticleService implements ArticleServiceInterface {
@@ -31,7 +43,9 @@ export class ArticleService implements ArticleServiceInterface {
       return { article: null, errMessage: "Invalid userId" };
     }
 
-    const checkCategory = await this.articleRepo.getCategoryById(article.category as string);
+    const checkCategory = await this.articleRepo.getCategoryById(
+      article.category as string
+    );
     if (!checkCategory) {
       return { article: null, errMessage: "Invalid Category" };
     }
@@ -62,6 +76,33 @@ export class ArticleService implements ArticleServiceInterface {
 
   public async count(): Promise<number> {
     return this.articleRepo.count();
+  }
+
+  public async leaveComment(
+    comment: CommentInterface
+  ): Promise<{ comment: CommentInterface | null; errMessage: string }> {
+    return {
+      comment: await this.articleRepo.leaveComment(comment),
+      errMessage: "",
+    };
+  }
+  
+  public async createCategory(
+    category: CategoryInterface
+  ): Promise<{ category: CategoryInterface | null; errMessage: string }> {
+    return {
+      category: await this.articleRepo.createCategory(category),
+      errMessage: "",
+    };
+  }
+
+  public async addLike(
+    like: LikeInterface
+  ): Promise<{ like: LikeInterface | null; errMessage: string }> {
+    return {
+      like: await this.articleRepo.addLike(like),
+      errMessage: "",
+    };
   }
 }
 
