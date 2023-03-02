@@ -2,8 +2,6 @@
 
 User Blog API
 
-## Description
-
 ## Installation with Docker
 
 1. Clone from git
@@ -26,5 +24,11 @@ $ dokcer-compose up
 
 ```bash
 # unit tests
-$ yarn test-unit
+$ yarn run test
+
+# e2e tests
+$ yarn run test:e2e
+
+# test coverage
+$ yarn run test:cov
 ```
