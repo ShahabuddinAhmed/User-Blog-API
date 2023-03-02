@@ -1,4 +1,5 @@
 import { CategoryInterface, CategoryModel } from "./../model/category";
+import { UpdateResult } from "mongodb";
 import { Types } from "mongoose";
 import { CommentModel, CommentInterface } from "./../model/comment";
 import { LikeModel, LikeInterface } from "./../model/like";
@@ -9,18 +10,16 @@ export interface ArticleRepoInterface {
   create(article: ArticleInterface): Promise<ArticleInterface>;
   get(skip: number, limit: number, sort: SortType): Promise<ArticleInterface[]>;
   getById(articleId: string): Promise<ArticleInterface | null>;
-  leaveComment(
-    userId: string,
-    articleId: string,
-    content: string
-  ): Promise<CommentInterface>;
+  leaveComment(comment: CommentInterface): Promise<CommentInterface>;
   giveLike(
     userId: string,
     articleId: string,
     isLike: boolean
   ): Promise<LikeInterface>;
   count(): Promise<number>;
+  createCategory(category: CategoryInterface): Promise<CategoryInterface>;
   getCategoryById(categoryId: string): Promise<CategoryInterface | null>;
+  addLike(like: LikeInterface): Promise<LikeInterface>;
 }
 
 export class ArticleRepo implements ArticleRepoInterface {
@@ -40,6 +39,16 @@ export class ArticleRepo implements ArticleRepoInterface {
     return this.articleModel.create(article);
   }
 
+  private async updateArticleById(
+    articleId: string,
+    commentId: string
+  ): Promise<UpdateResult> {
+    return this.articleModel.updateOne(
+      { _id: articleId },
+      { $push: { comments: commentId } }
+    );
+  }
+
   public async get(
     skip: number,
     limit: number,
@@ -53,11 +62,23 @@ export class ArticleRepo implements ArticleRepoInterface {
   }
 
   public async getById(articleId: string): Promise<ArticleInterface | null> {
-    return this.articleModel.findById({ _id: articleId }).populate("category");
+    return this.articleModel.findById({ _id: articleId }).populate("comments");
   }
 
-  public async getCategoryById(categoryId: string): Promise<CategoryInterface | null> {
+  public async createCategory(
+    category: CategoryInterface
+  ): Promise<CategoryInterface> {
+    return this.categoryModel.create(category);
+  }
+
+  public async getCategoryById(
+    categoryId: string
+  ): Promise<CategoryInterface | null> {
     return this.categoryModel.findById({ _id: categoryId });
+  }
+
+  public async addLike(like: LikeInterface): Promise<LikeInterface> {
+    return this.likeModel.create(like);
   }
 
   public async count(): Promise<number> {
@@ -65,34 +86,41 @@ export class ArticleRepo implements ArticleRepoInterface {
   }
 
   public async leaveComment(
-    userId: string,
-    articleId: string,
-    content: string
+    comment: CommentInterface
   ): Promise<CommentInterface> {
-    const checkExistingComment = await this.getCommentByArticleId(articleId);
+    const checkExistingComment = await this.getCommentByArticleId(
+      comment.article as string
+    );
     if (!checkExistingComment) {
-      const parentId = new Types.ObjectId();
-      return this.commentModel.create({
-        _id: parentId,
-        userId,
-        articleId,
-        parentId,
-        content,
+      const parent = new Types.ObjectId();
+      const createdComment = await this.commentModel.create({
+        _id: parent,
+        ...comment,
+        parent,
       });
+      await this.updateArticleById(
+        comment.article as string,
+        createdComment.id as string
+      );
+      return createdComment;
     }
 
-    return this.commentModel.create({
-      userId,
-      articleId,
-      parentId: checkExistingComment.id,
-      content,
+    const createdComment = await this.commentModel.create({
+      ...comment,
+      parent: checkExistingComment.id,
     });
+
+    await this.updateArticleById(
+      comment.article as string,
+      createdComment.id as string
+    );
+    return createdComment;
   }
 
-  public async getCommentByArticleId(
-    articleId: string
-  ): Promise<ArticleInterface> {
-    return this.commentModel.findOne({ articleId }).populate("category");
+  private async getCommentByArticleId(
+    article: string
+  ): Promise<CommentInterface | null> {
+    return this.commentModel.findOne({ article });
   }
 
   public async giveLike(

@@ -42,7 +42,7 @@ export class UserRepo implements UserRepoInterface {
   }
 
   public async getByEmail(email: string): Promise<UserInterface | null> {
-    return this.userModel.findById({ email });
+    return this.userModel.findOne({ email });
   }
 
   public async getLike(
@@ -55,7 +55,7 @@ export class UserRepo implements UserRepoInterface {
       { userId },
       {},
       { skip, limit, sort: { createdAt: sort === SortType.ASC ? 1 : -1 } }
-    );
+    ).populate("article");
   }
 
   public async count(userId: string): Promise<number> {
