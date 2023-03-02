@@ -32,6 +32,7 @@ export class UserController
     const schema = object().keys({
       firstName: string().required(),
       lastName: string().required().allow(""),
+      password: string().required().min(8),
       email: string().email().required(),
       mobile: string().required().allow(""),
       address: string().required().allow(""),

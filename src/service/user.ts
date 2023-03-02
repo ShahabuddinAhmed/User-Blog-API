@@ -1,3 +1,4 @@
+import bcrypt from "bcrypt";
 import { LikeInterface } from "../model/like";
 import { UserInterface, SortType } from "../model/user";
 import { UserRepoInterface } from "../repo/user";
@@ -31,8 +32,16 @@ export class UserService implements UserServiceInterface {
     if (checkUser) {
       return { user: null, errMessage: "This User is already exist" };
     }
+    const password = await this.hashPassword(user.password);
+    return {
+      user: await this.userRepo.create({ ...user, password }),
+      errMessage: "",
+    };
+  }
 
-    return { user: await this.userRepo.create(user), errMessage: "" };
+  private async hashPassword(password: string): Promise<string> {
+    const salt = await bcrypt.genSalt(10);
+    return await bcrypt.hash(password, salt);
   }
 
   public async update(
