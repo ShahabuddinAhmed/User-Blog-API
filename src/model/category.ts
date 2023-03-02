@@ -14,4 +14,6 @@ const schema = new Schema<CategoryInterface>(
   { timestamps: true, versionKey: false }
 );
 
+schema.index({ name: "text" });
+
 export const CategoryModel = model<CategoryInterface>("Category", schema);

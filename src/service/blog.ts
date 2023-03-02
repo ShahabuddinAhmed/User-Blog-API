@@ -10,7 +10,11 @@ export interface BlogServiceInterface {
   createArticle(
     article: ArticleInterface
   ): Promise<{ article: ArticleInterface | null; errMessage: string }>;
-  getArticle(skip: number, limit: number, sort: SortType): Promise<ArticleInterface[]>;
+  getArticle(
+    skip: number,
+    limit: number,
+    sort: SortType
+  ): Promise<ArticleInterface[]>;
   getArticleById(
     articleId: string
   ): Promise<{ article: ArticleInterface | null; errMessage: string }>;
@@ -21,6 +25,9 @@ export interface BlogServiceInterface {
   createCategory(
     category: CategoryInterface
   ): Promise<{ category: CategoryInterface | null; errMessage: string }>;
+  searchCategory(
+    search: string
+  ): Promise<{ categories: CategoryInterface[]; errMessage: string }>;
   addLike(
     like: LikeInterface
   ): Promise<{ like: LikeInterface | null; errMessage: string }>;
@@ -71,6 +78,15 @@ export class BlogService implements BlogServiceInterface {
     return {
       article: checkArticle,
       errMessage: checkArticle ? "" : "Invalid articleId",
+    };
+  }
+
+  public async searchCategory(
+    search: string
+  ): Promise<{ categories: CategoryInterface[]; errMessage: string }> {
+    return {
+      categories: await this.blogRepo.getCategoryByName(search),
+      errMessage: "",
     };
   }
 

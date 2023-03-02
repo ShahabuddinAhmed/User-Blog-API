@@ -23,6 +23,7 @@ export interface BlogRepoInterface {
   countArticle(): Promise<number>;
   createCategory(category: CategoryInterface): Promise<CategoryInterface>;
   getCategoryById(categoryId: string): Promise<CategoryInterface | null>;
+  getCategoryByName(search: string): Promise<CategoryInterface[]>;
   addLike(like: LikeInterface): Promise<LikeInterface>;
 }
 
@@ -86,6 +87,14 @@ export class BlogRepo implements BlogRepoInterface {
     categoryId: string
   ): Promise<CategoryInterface | null> {
     return this.categoryModel.findById({ _id: categoryId });
+  }
+
+  public async getCategoryByName(
+    search: string
+  ): Promise<CategoryInterface[]> {
+    return this.categoryModel.find({
+      name: { $regex: `.*${search}.*`, $options: "i" },
+    });
   }
 
   public async addLike(like: LikeInterface): Promise<LikeInterface> {

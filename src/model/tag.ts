@@ -14,4 +14,6 @@ const schema = new Schema<TagInterface>(
   { timestamps: true, versionKey: false }
 );
 
+schema.index({ title: "text" });
+
 export const TagModel = model<TagInterface>("Tag", schema);

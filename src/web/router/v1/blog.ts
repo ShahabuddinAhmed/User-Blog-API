@@ -9,7 +9,8 @@ export const newBlogRouter = async (
   router.get("/article/list", blogController.getArticle);
   router.get("/article/detail", blogController.getArticleById);
   router.post("/leaveComment", blogController.leaveComment);
-  router.post("/createCategory", blogController.createCategory);
+  router.post("/category/create", blogController.createCategory);
+  router.get("/category", blogController.searchCategory);
   router.post("/addLike", blogController.addLike);
   return router;
 };

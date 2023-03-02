@@ -26,4 +26,6 @@ const schema = new Schema<UserInterface>(
   { timestamps: true, versionKey: false }
 );
 
+schema.index({ email: 1 });
+
 export const UserModel = model<UserInterface>("User", schema);

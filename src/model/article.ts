@@ -36,4 +36,6 @@ const schema = new Schema<ArticleInterface>(
   { timestamps: true, versionKey: false }
 );
 
+schema.index({ name: "text" });
+
 export const ArticleModel = model<ArticleInterface>("Article", schema);
