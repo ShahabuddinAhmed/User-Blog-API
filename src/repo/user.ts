@@ -51,11 +51,13 @@ export class UserRepo implements UserRepoInterface {
     limit: number,
     sort: SortType
   ): Promise<LikeInterface[]> {
-    return this.likeModel.find(
-      { userId },
-      {},
-      { skip, limit, sort: { createdAt: sort === SortType.ASC ? 1 : -1 } }
-    ).populate("article");
+    return this.likeModel
+      .find(
+        { userId },
+        {},
+        { skip, limit, sort: { createdAt: sort === SortType.ASC ? 1 : -1 } }
+      )
+      .populate("article", ["title", "subTitle"]);
   }
 
   public async count(userId: string): Promise<number> {

@@ -8,7 +8,11 @@ import { SortType } from "../model/user";
 
 export interface BlogRepoInterface {
   createArticle(article: ArticleInterface): Promise<ArticleInterface>;
-  getArticle(skip: number, limit: number, sort: SortType): Promise<ArticleInterface[]>;
+  getArticle(
+    skip: number,
+    limit: number,
+    sort: SortType
+  ): Promise<ArticleInterface[]>;
   getArticleById(articleId: string): Promise<ArticleInterface | null>;
   leaveComment(comment: CommentInterface): Promise<CommentInterface>;
   giveLike(
@@ -35,7 +39,9 @@ export class BlogRepo implements BlogRepoInterface {
     this.categoryModel = categoryModel;
   }
 
-  public async createArticle(article: ArticleInterface): Promise<ArticleInterface> {
+  public async createArticle(
+    article: ArticleInterface
+  ): Promise<ArticleInterface> {
     return this.articleModel.create(article);
   }
 
@@ -54,15 +60,20 @@ export class BlogRepo implements BlogRepoInterface {
     limit: number,
     sort: SortType
   ): Promise<ArticleInterface[]> {
-    return this.articleModel.find(
-      {},
-      { content: -1, user: -1 },
-      { skip, limit, sort: { createdAt: sort === SortType.ASC ? 1 : -1 } }
-    );
+    return this.articleModel.find({}, ["title", "subTitle", "slug"], {
+      skip,
+      limit,
+      sort: { createdAt: sort === SortType.ASC ? 1 : -1 },
+    });
   }
 
-  public async getArticleById(articleId: string): Promise<ArticleInterface | null> {
-    return this.articleModel.findById({ _id: articleId }).populate("comments");
+  public async getArticleById(
+    articleId: string
+  ): Promise<ArticleInterface | null> {
+    return await this.articleModel
+      .findById({ _id: articleId })
+      .populate("comments")
+      .populate("category");
   }
 
   public async createCategory(
@@ -85,6 +96,11 @@ export class BlogRepo implements BlogRepoInterface {
     return this.articleModel.count();
   }
 
+  /**
+   *
+   * @param comment Here is execute multiple db operations. will be add transaction later
+   * @returns
+   */
   public async leaveComment(
     comment: CommentInterface
   ): Promise<CommentInterface> {
