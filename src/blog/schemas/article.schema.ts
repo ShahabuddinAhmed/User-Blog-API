@@ -1,13 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { Category, CategoryDocument } from './category.schema';
-import { User, UserDocument } from './user.schema';
-import { Comment, CommentDocument } from './comment.schema';
+import { Category } from './category.schema';
+import { User } from '../../user/schemas/user.schema';
 
-export type PostDocument = Post & Document;
+export type ArticleDocument = Article & Document;
 
-@Schema()
-export class Post {
+@Schema({
+  timestamps: true,
+  versionKey: false,
+})
+export class Article {
   @Prop({ required: true, type: String, trim: true })
   title: string;
 
@@ -20,14 +22,11 @@ export class Post {
   @Prop({ required: true, type: Text })
   content: string;
 
-  @Prop([{ type: Types.ObjectId, ref: 'Comment' }])
-  comments: CommentDocument[];
-
   @Prop({ type: Types.ObjectId, ref: 'Category' })
-  category: CategoryDocument;
+  category: Category;
 
   @Prop({ type: Types.ObjectId, ref: 'User' })
-  user: UserDocument;
+  user: User;
 }
 
-export const PostSchema = SchemaFactory.createForClass(Post);
+export const ArticleSchema = SchemaFactory.createForClass(Article);
