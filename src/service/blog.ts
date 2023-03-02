@@ -47,14 +47,14 @@ export class BlogService implements BlogServiceInterface {
   ): Promise<{ article: ArticleInterface | null; errMessage: string }> {
     const checkUser = await this.userRepo.getById(article.user as string);
     if (!checkUser) {
-      return { article: null, errMessage: "Invalid userId" };
+      return { article: null, errMessage: "Please provide a valid userId" };
     }
 
     const checkCategory = await this.blogRepo.getCategoryById(
       article.category as string
     );
     if (!checkCategory) {
-      return { article: null, errMessage: "Invalid Category" };
+      return { article: null, errMessage: "Please provide a valid categoryId" };
     }
 
     return {
@@ -77,7 +77,7 @@ export class BlogService implements BlogServiceInterface {
     const checkArticle = await this.blogRepo.getArticleById(articleId);
     return {
       article: checkArticle,
-      errMessage: checkArticle ? "" : "Invalid articleId",
+      errMessage: checkArticle ? "" : "Please provide a valid articleId",
     };
   }
 
@@ -106,6 +106,16 @@ export class BlogService implements BlogServiceInterface {
   public async createCategory(
     category: CategoryInterface
   ): Promise<{ category: CategoryInterface | null; errMessage: string }> {
+    const checkCategories = await this.blogRepo.getCategoryByName(
+      category.name
+    );
+    if (checkCategories.length) {
+      return {
+        category: null,
+        errMessage: "This category already exist",
+      };
+    }
+
     return {
       category: await this.blogRepo.createCategory(category),
       errMessage: "",
@@ -115,6 +125,18 @@ export class BlogService implements BlogServiceInterface {
   public async addLike(
     like: LikeInterface
   ): Promise<{ like: LikeInterface | null; errMessage: string }> {
+    const checkUser = await this.userRepo.getById(like.user as string);
+    if (!checkUser) {
+      return { like: null, errMessage: "Please provide a valid userId" };
+    }
+
+    const checkArticle = await this.blogRepo.getArticleById(
+      like.article as string
+    );
+    if (!checkArticle) {
+      return { like: null, errMessage: "Please provide a valid articleId" };
+    }
+
     return {
       like: await this.blogRepo.addLike(like),
       errMessage: "",

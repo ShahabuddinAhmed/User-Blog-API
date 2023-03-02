@@ -82,7 +82,7 @@ export class BlogController
 
       const response = await BlogSerializer.serializeArticle(article);
       return await this.sendResponse(
-        200,
+        201,
         "SUCCESS",
         "Article Successfully created",
         response,
@@ -90,9 +90,13 @@ export class BlogController
         res
       );
     } catch (err) {
-      this.logger.error("Failed getLike handler", "user.handler.getLike", {
-        error: err,
-      });
+      this.logger.error(
+        "Failed createArticle handler",
+        "user.handler.createArticle",
+        {
+          error: err,
+        }
+      );
       return await this.sendResponse(
         500,
         "E_INTERNAL_SERVER_ERROR",
@@ -139,16 +143,20 @@ export class BlogController
       return await this.sendResponse(
         200,
         "SUCCESS",
-        "User ",
+        "Article list",
         response,
         [],
         res,
         { skip, limit, count }
       );
     } catch (err) {
-      this.logger.error("Failed getLike handler", "user.handler.getLike", {
-        error: err,
-      });
+      this.logger.error(
+        "Failed getArticle handler",
+        "user.handler.getArticle",
+        {
+          error: err,
+        }
+      );
       return await this.sendResponse(
         500,
         "E_INTERNAL_SERVER_ERROR",
@@ -199,15 +207,19 @@ export class BlogController
       return await this.sendResponse(
         200,
         "SUCCESS",
-        "User ",
+        "Article detail",
         response,
         [],
         res
       );
     } catch (err) {
-      this.logger.error("Failed getLike handler", "user.handler.getLike", {
-        error: err,
-      });
+      this.logger.error(
+        "Failed getArticleById handler",
+        "user.handler.getArticleById",
+        {
+          error: err,
+        }
+      );
       return await this.sendResponse(
         500,
         "E_INTERNAL_SERVER_ERROR",
@@ -247,7 +259,7 @@ export class BlogController
       if (!category || errMessage) {
         return await this.sendResponse(
           400,
-          "E_CREATE_ARTICLE",
+          "E_EXIST_CATEGORY",
           errMessage,
           null,
           [],
@@ -257,7 +269,7 @@ export class BlogController
 
       const response = await BlogSerializer.serializeCategory(category);
       return await this.sendResponse(
-        200,
+        201,
         "SUCCESS",
         "Article Successfully created",
         response,
@@ -311,15 +323,19 @@ export class BlogController
       return await this.sendResponse(
         200,
         "SUCCESS",
-        "Article Successfully created",
+        "Category search list",
         response,
         [],
         res
       );
     } catch (err) {
-      this.logger.error("Failed getLike handler", "user.handler.getLike", {
-        error: err,
-      });
+      this.logger.error(
+        "Failed searchCategory handler",
+        "user.handler.searchCategory",
+        {
+          error: err,
+        }
+      );
       return await this.sendResponse(
         500,
         "E_INTERNAL_SERVER_ERROR",
@@ -370,7 +386,7 @@ export class BlogController
 
       // const response = await BlogSerializer.serializeArticle(category);
       return await this.sendResponse(
-        200,
+        201,
         "SUCCESS",
         "Comment Successfully created",
         comment,
@@ -433,11 +449,10 @@ export class BlogController
         );
       }
 
-      // const response = await BlogSerializer.serializeArticle(category);
       return await this.sendResponse(
-        200,
+        201,
         "SUCCESS",
-        "Article Successfully created",
+        "Like Successfully created",
         like,
         [],
         res

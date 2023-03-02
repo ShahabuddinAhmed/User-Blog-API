@@ -70,9 +70,9 @@ export class UserController
 
       const response = await UserSerializer.serializeUser(user);
       return await this.sendResponse(
-        200,
+        201,
         "SUCCESS",
-        "User Successfully created.",
+        "User Successfully created",
         response,
         [],
         res
