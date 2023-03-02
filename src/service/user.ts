@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { LikeInterface } from "../model/like";
 import { UserInterface, SortType } from "../model/user";
 import { UserRepoInterface } from "../repo/user";
