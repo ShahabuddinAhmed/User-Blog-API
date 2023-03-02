@@ -1,6 +1,6 @@
 import { ArticleInterface } from "../../model/article";
 
-export class ArticleSerializer {
+export class BlogSerializer {
   public static async serializeArticle(article: ArticleInterface) {
     return {
       id: article.id,
@@ -14,7 +14,7 @@ export class ArticleSerializer {
   public static async serializeArticles(articles: ArticleInterface[]) {
     return Promise.all(
       articles.map(async (article) => {
-        return await ArticleSerializer.serializeArticle(article);
+        return await BlogSerializer.serializeArticle(article);
       })
     );
   }

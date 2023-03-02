@@ -10,14 +10,14 @@ import { CategoryModel } from "./model/category";
 import { LikeModel } from "./model/like";
 
 import { newUserRepo } from "./repo/user";
-import { newArticleRepo } from "./repo/article";
+import { newBlogRepo } from "./repo/blog";
 
 import { newUserService } from "./service/user";
-import { newArticleService } from "./service/article";
+import { newBlogService } from "./service/blog";
 
 import { newV1Router } from "./web/router/v1/index";
 import { newUserController } from "./web/controller/user";
-import { newArticleController } from "./web/controller/article";
+import { newBlogController } from "./web/controller/blog";
 
 import config from "./config/config";
 import { newLogManager, newLogManagerStreamer } from "./infra/logger";
@@ -42,15 +42,20 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
   // initializing repos
   const userRepo = await newUserRepo(UserModel, LikeModel);
-  const articleRepo = await newArticleRepo(ArticleModel, CommentModel, LikeModel, CategoryModel);
+  const articleRepo = await newBlogRepo(
+    ArticleModel,
+    CommentModel,
+    LikeModel,
+    CategoryModel
+  );
 
   // initializing services
   const userService = await newUserService(userRepo);
-  const articleService = await newArticleService(userRepo, articleRepo);
+  const articleService = await newBlogService(userRepo, articleRepo);
 
   // initializing controllers
   const userController = await newUserController(userService, logger);
-  const articleController = await newArticleController(articleService, logger);
+  const articleController = await newBlogController(articleService, logger);
 
   //initialize routers
   const v1Router = await newV1Router(userController, articleController);

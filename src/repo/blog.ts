@@ -1,28 +1,28 @@
-import { CategoryInterface, CategoryModel } from "./../model/category";
+import { CategoryInterface, CategoryModel } from "../model/category";
 import { UpdateResult } from "mongodb";
 import { Types } from "mongoose";
-import { CommentModel, CommentInterface } from "./../model/comment";
-import { LikeModel, LikeInterface } from "./../model/like";
+import { CommentModel, CommentInterface } from "../model/comment";
+import { LikeModel, LikeInterface } from "../model/like";
 import { ArticleInterface, ArticleModel } from "../model/article";
 import { SortType } from "../model/user";
 
-export interface ArticleRepoInterface {
-  create(article: ArticleInterface): Promise<ArticleInterface>;
-  get(skip: number, limit: number, sort: SortType): Promise<ArticleInterface[]>;
-  getById(articleId: string): Promise<ArticleInterface | null>;
+export interface BlogRepoInterface {
+  createArticle(article: ArticleInterface): Promise<ArticleInterface>;
+  getArticle(skip: number, limit: number, sort: SortType): Promise<ArticleInterface[]>;
+  getArticleById(articleId: string): Promise<ArticleInterface | null>;
   leaveComment(comment: CommentInterface): Promise<CommentInterface>;
   giveLike(
     userId: string,
     articleId: string,
     isLike: boolean
   ): Promise<LikeInterface>;
-  count(): Promise<number>;
+  countArticle(): Promise<number>;
   createCategory(category: CategoryInterface): Promise<CategoryInterface>;
   getCategoryById(categoryId: string): Promise<CategoryInterface | null>;
   addLike(like: LikeInterface): Promise<LikeInterface>;
 }
 
-export class ArticleRepo implements ArticleRepoInterface {
+export class BlogRepo implements BlogRepoInterface {
   constructor(
     public articleModel: typeof ArticleModel,
     public commentModel: typeof CommentModel,
@@ -35,7 +35,7 @@ export class ArticleRepo implements ArticleRepoInterface {
     this.categoryModel = categoryModel;
   }
 
-  public async create(article: ArticleInterface): Promise<ArticleInterface> {
+  public async createArticle(article: ArticleInterface): Promise<ArticleInterface> {
     return this.articleModel.create(article);
   }
 
@@ -49,7 +49,7 @@ export class ArticleRepo implements ArticleRepoInterface {
     );
   }
 
-  public async get(
+  public async getArticle(
     skip: number,
     limit: number,
     sort: SortType
@@ -61,7 +61,7 @@ export class ArticleRepo implements ArticleRepoInterface {
     );
   }
 
-  public async getById(articleId: string): Promise<ArticleInterface | null> {
+  public async getArticleById(articleId: string): Promise<ArticleInterface | null> {
     return this.articleModel.findById({ _id: articleId }).populate("comments");
   }
 
@@ -81,7 +81,7 @@ export class ArticleRepo implements ArticleRepoInterface {
     return this.likeModel.create(like);
   }
 
-  public async count(): Promise<number> {
+  public async countArticle(): Promise<number> {
     return this.articleModel.count();
   }
 
@@ -132,13 +132,13 @@ export class ArticleRepo implements ArticleRepoInterface {
   }
 }
 
-export const newArticleRepo = async (
+export const newBlogRepo = async (
   articleModel: typeof ArticleModel,
   commentModel: typeof CommentModel,
   likeModel: typeof LikeModel,
   categoryModel: typeof CategoryModel
-): Promise<ArticleRepoInterface> => {
-  return new ArticleRepo(articleModel, commentModel, likeModel, categoryModel);
+): Promise<BlogRepoInterface> => {
+  return new BlogRepo(articleModel, commentModel, likeModel, categoryModel);
 };
 
-export default ArticleRepo;
+export default BlogRepo;

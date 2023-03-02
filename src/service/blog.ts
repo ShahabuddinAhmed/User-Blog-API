@@ -1,20 +1,20 @@
-import { CommentInterface } from "./../model/comment";
+import { CommentInterface } from "../model/comment";
 import { LikeInterface } from "../model/like";
 import { CategoryInterface } from "../model/category";
 import { ArticleInterface } from "../model/article";
 import { UserRepoInterface } from "../repo/user";
-import { ArticleRepoInterface } from "../repo/article";
+import { BlogRepoInterface } from "../repo/blog";
 import { SortType } from "../model/user";
 
-export interface ArticleServiceInterface {
-  create(
+export interface BlogServiceInterface {
+  createArticle(
     article: ArticleInterface
   ): Promise<{ article: ArticleInterface | null; errMessage: string }>;
-  get(skip: number, limit: number, sort: SortType): Promise<ArticleInterface[]>;
-  getById(
+  getArticle(skip: number, limit: number, sort: SortType): Promise<ArticleInterface[]>;
+  getArticleById(
     articleId: string
   ): Promise<{ article: ArticleInterface | null; errMessage: string }>;
-  count(): Promise<number>;
+  countArticle(): Promise<number>;
   leaveComment(
     comment: CommentInterface
   ): Promise<{ comment: CommentInterface | null; errMessage: string }>;
@@ -26,16 +26,16 @@ export interface ArticleServiceInterface {
   ): Promise<{ like: LikeInterface | null; errMessage: string }>;
 }
 
-export class ArticleService implements ArticleServiceInterface {
+export class BlogService implements BlogServiceInterface {
   constructor(
     public userRepo: UserRepoInterface,
-    public articleRepo: ArticleRepoInterface
+    public blogRepo: BlogRepoInterface
   ) {
     this.userRepo = userRepo;
-    this.articleRepo = articleRepo;
+    this.blogRepo = blogRepo;
   }
 
-  public async create(
+  public async createArticle(
     article: ArticleInterface
   ): Promise<{ article: ArticleInterface | null; errMessage: string }> {
     const checkUser = await this.userRepo.getById(article.user as string);
@@ -43,7 +43,7 @@ export class ArticleService implements ArticleServiceInterface {
       return { article: null, errMessage: "Invalid userId" };
     }
 
-    const checkCategory = await this.articleRepo.getCategoryById(
+    const checkCategory = await this.blogRepo.getCategoryById(
       article.category as string
     );
     if (!checkCategory) {
@@ -51,47 +51,47 @@ export class ArticleService implements ArticleServiceInterface {
     }
 
     return {
-      article: await this.articleRepo.create(article),
+      article: await this.blogRepo.createArticle(article),
       errMessage: "",
     };
   }
 
-  public async get(
+  public async getArticle(
     skip: number,
     limit: number,
     sort: SortType
   ): Promise<ArticleInterface[]> {
-    return this.articleRepo.get(skip, limit, sort);
+    return this.blogRepo.getArticle(skip, limit, sort);
   }
 
-  public async getById(
+  public async getArticleById(
     articleId: string
   ): Promise<{ article: ArticleInterface | null; errMessage: string }> {
-    const checkArticle = await this.articleRepo.getById(articleId);
+    const checkArticle = await this.blogRepo.getArticleById(articleId);
     return {
       article: checkArticle,
       errMessage: checkArticle ? "" : "Invalid articleId",
     };
   }
 
-  public async count(): Promise<number> {
-    return this.articleRepo.count();
+  public async countArticle(): Promise<number> {
+    return this.blogRepo.countArticle();
   }
 
   public async leaveComment(
     comment: CommentInterface
   ): Promise<{ comment: CommentInterface | null; errMessage: string }> {
     return {
-      comment: await this.articleRepo.leaveComment(comment),
+      comment: await this.blogRepo.leaveComment(comment),
       errMessage: "",
     };
   }
-  
+
   public async createCategory(
     category: CategoryInterface
   ): Promise<{ category: CategoryInterface | null; errMessage: string }> {
     return {
-      category: await this.articleRepo.createCategory(category),
+      category: await this.blogRepo.createCategory(category),
       errMessage: "",
     };
   }
@@ -100,15 +100,15 @@ export class ArticleService implements ArticleServiceInterface {
     like: LikeInterface
   ): Promise<{ like: LikeInterface | null; errMessage: string }> {
     return {
-      like: await this.articleRepo.addLike(like),
+      like: await this.blogRepo.addLike(like),
       errMessage: "",
     };
   }
 }
 
-export const newArticleService = async (
+export const newBlogService = async (
   userRepo: UserRepoInterface,
-  articleRepo: ArticleRepoInterface
+  blogRepo: BlogRepoInterface
 ) => {
-  return new ArticleService(userRepo, articleRepo);
+  return new BlogService(userRepo, blogRepo);
 };
