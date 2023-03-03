@@ -7,6 +7,7 @@ class Category {
   _id: string;
   name: string;
   slug: string;
+  articles: string[];
 
   @Exclude()
   createdAt: string;

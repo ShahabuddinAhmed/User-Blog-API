@@ -1,3 +1,4 @@
+import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
@@ -5,7 +6,7 @@ import { UserDocument } from 'src/user/schemas/user.schema';
 import { Category, CategoryDocument } from './schemas/category.schema';
 import { Article, ArticleDocument } from './schemas/article.schema';
 import { Like, LikeDocument } from './schemas/like.schema';
-import { CategoryDto } from './dto/category.dto';
+import { CreateCategoryDto } from './dto/create-category.dto';
 import { LikeDto } from './dto/like.dto';
 import { JwtPayloadDto } from 'src/user/dto/jwt-payload.dto';
 import { ArticleDto } from './dto/article.dto';
@@ -22,10 +23,11 @@ export class BlogService {
   ) {}
 
   public async createCategory(
-    categoryDto: CategoryDto,
+    createCategoryDto: CreateCategoryDto,
   ): Promise<{ category: CategoryDocument | null; errMessage: string }> {
-    const checkCategory = await this.categoryModel.findOne({
-      name: categoryDto.name,
+    const checkCategory = await this.getCategory({
+      name: createCategoryDto.name,
+      slug: createCategoryDto.slug,
     });
     if (checkCategory) {
       return {
@@ -35,7 +37,31 @@ export class BlogService {
     }
 
     return {
-      category: await this.categoryModel.create(categoryDto),
+      category: await this.categoryModel.create(createCategoryDto),
+      errMessage: '',
+    };
+  }
+
+  public async updateCategory(
+    updateCategoryDto: UpdateCategoryDto,
+  ): Promise<{ category: CategoryDocument | null; errMessage: string }> {
+    const checkCategory = await this.getCategory({
+      name: updateCategoryDto.name,
+      slug: updateCategoryDto.slug,
+    });
+    if (checkCategory) {
+      return {
+        category: null,
+        errMessage: 'This category already exist',
+      };
+    }
+
+    return {
+      category: await this.categoryModel.findOneAndUpdate(
+        { _id: updateCategoryDto.categoryId },
+        updateCategoryDto,
+        { new: true },
+      ),
       errMessage: '',
     };
   }
@@ -44,7 +70,9 @@ export class BlogService {
     articleDto: ArticleDto,
     jwtPayloadDto: JwtPayloadDto,
   ): Promise<{ article: ArticleDocument | null; errMessage: string }> {
-    const checkCategory = await this.getCategoryById(articleDto.category);
+    const checkCategory = await this.getCategory({
+      _id: articleDto.category,
+    });
     if (!checkCategory) {
       return { article: null, errMessage: 'Please provide a valid categoryId' };
     }
@@ -131,9 +159,7 @@ export class BlogService {
     return this.articleModel.findById({ _id: articleId });
   }
 
-  private async getCategoryById(
-    categoryId: string,
-  ): Promise<CategoryDocument | null> {
-    return this.categoryModel.findById({ _id: categoryId });
+  private async getCategory(query: object): Promise<CategoryDocument | null> {
+    return this.categoryModel.findOne(query);
   }
 }
