@@ -23,7 +23,7 @@ export class BlogService {
 
   public async createCategory(
     categoryDto: CategoryDto,
-  ): Promise<{ category: Category | null; errMessage: string }> {
+  ): Promise<{ category: CategoryDocument | null; errMessage: string }> {
     const checkCategory = await this.categoryModel.findOne({
       name: categoryDto.name,
     });
@@ -43,7 +43,7 @@ export class BlogService {
   public async createArticle(
     articleDto: ArticleDto,
     jwtPayloadDto: JwtPayloadDto,
-  ): Promise<{ article: Article | null; errMessage: string }> {
+  ): Promise<{ article: ArticleDocument | null; errMessage: string }> {
     const checkCategory = await this.getCategoryById(articleDto.category);
     if (!checkCategory) {
       return { article: null, errMessage: 'Please provide a valid categoryId' };
@@ -61,7 +61,7 @@ export class BlogService {
   public async leaveComment(
     commentDto: CommentDto,
     jwtPayloadDto: JwtPayloadDto,
-  ): Promise<{ comment: Comment | null; errMessage: string }> {
+  ): Promise<{ comment: CommentDocument | null; errMessage: string }> {
     const checkArticle = await this.getArticleById(commentDto.article);
     if (!checkArticle) {
       return { comment: null, errMessage: 'Please provide a valid articleId' };
@@ -103,7 +103,7 @@ export class BlogService {
   public async addLike(
     likeDto: LikeDto,
     jwtPayloadDto: JwtPayloadDto,
-  ): Promise<{ like: Like | null; errMessage: string }> {
+  ): Promise<{ like: LikeDocument | null; errMessage: string }> {
     const checkArticle = await this.getArticleById(likeDto.article);
     if (!checkArticle) {
       return { like: null, errMessage: 'Please provide a valid articleId' };
@@ -118,11 +118,15 @@ export class BlogService {
     };
   }
 
-  private async getArticleById(articleId: string): Promise<Article | null> {
+  private async getArticleById(
+    articleId: string,
+  ): Promise<ArticleDocument | null> {
     return this.articleModel.findById({ _id: articleId });
   }
 
-  private async getCategoryById(categoryId: string): Promise<Category | null> {
+  private async getCategoryById(
+    categoryId: string,
+  ): Promise<CategoryDocument | null> {
     return this.articleModel.findById({ _id: categoryId });
   }
 }

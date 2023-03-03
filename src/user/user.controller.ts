@@ -48,7 +48,7 @@ export class UserController {
   ): Promise<RegisterSerializer> {
     const { user, errMessage } = await this.userService.register(registerDto);
     if (errMessage) {
-      this.loggerService.error(errMessage, 'auth.handler.register');
+      this.loggerService.error(errMessage, 'user.handler.register');
       throw new BadRequestException(errMessage);
     }
 
@@ -80,7 +80,7 @@ export class UserController {
     if (errMessage) {
       this.loggerService.error(
         JSON.stringify(errMessage),
-        'auth.handler.login',
+        'user.handler.login',
       );
       throw new BadRequestException(errMessage);
     }
