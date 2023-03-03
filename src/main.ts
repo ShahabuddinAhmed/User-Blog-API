@@ -14,22 +14,22 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.setGlobalPrefix('api/v1');
 
-  // const rmqServer = await NestFactory.createMicroservice<MicroserviceOptions>(
-  //   AppModule,
-  //   {
-  //     transport: Transport.RMQ,
-  //     options: {
-  //       urls: [process.env.RABBITMQ_URI],
-  //       queue: process.env.RABBITMQ_EMAIL_QUEUE,
-  //       noAck: false,
-  //       prefetchCount: 100, // prefetchCount is depends on server resource that can be server auto scele up
-  //       queueOptions: {
-  //         durable: true,
-  //       },
-  //     },
-  //   },
-  // );
-  // await rmqServer.listen();
+  const rmqServer = await NestFactory.createMicroservice<MicroserviceOptions>(
+    AppModule,
+    {
+      transport: Transport.RMQ,
+      options: {
+        urls: [process.env.RABBITMQ_URI],
+        queue: process.env.RABBITMQ_QUEUE,
+        noAck: false,
+        prefetchCount: 100, // prefetchCount is depends on server resource that can be server auto scele up
+        queueOptions: {
+          durable: true,
+        },
+      },
+    },
+  );
+  await rmqServer.listen();
 
   const options = new DocumentBuilder()
     .setTitle('Blog API')

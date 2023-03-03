@@ -1,0 +1,4 @@
+export enum EventPatternType {
+  CREATED_CATEGORY = 'CREATED_CATEGORY',
+  UPDATED_CATEGORY = 'UPDATED_CATEGORY',
+}

@@ -7,6 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { HelperModule } from './helper/helper.module';
 import { UserModule } from './user/user.module';
 import { BlogModule } from './blog/blog.module';
+import { MessageQueueModule } from './message-queue/message-queue.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { BlogModule } from './blog/blog.module';
     HelperModule,
     UserModule,
     BlogModule,
+    MessageQueueModule,
   ],
   exports: [LoggerModule],
   controllers: [AppController],

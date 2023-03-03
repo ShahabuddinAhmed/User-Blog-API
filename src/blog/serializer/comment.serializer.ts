@@ -1,6 +1,6 @@
 import { Exclude, plainToClass, Type } from 'class-transformer';
 import { AppSerializer } from '../../app.serializer';
-import { CommentDocument } from '../schemas/Comment.schema';
+import { CommentDocument } from '../schemas/comment.schema';
 
 class Comment {
   @Type(() => String)

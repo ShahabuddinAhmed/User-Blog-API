@@ -1,7 +1,7 @@
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { LoggerService } from '../logger/logger.service';
 import { User, UserDocument } from './schemas/user.schema';
 import { Model } from 'mongoose';

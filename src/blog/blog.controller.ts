@@ -1,8 +1,9 @@
+import { UpdateCategoryDto } from './dto/update-category.dto';
 import { JwtAuthGuard } from './../user/guards/jwt-auth.guard';
 import { CommentSerializer } from './serializer/comment.serializer';
 import { CommentDto } from './dto/comment.dto';
 import { CategorySerializer } from './serializer/category.serializer';
-import { CategoryDto } from './dto/category.dto';
+import { CreateCategoryDto } from './dto/create-category.dto';
 import { LoggerService } from './../logger/logger.service';
 import {
   BadRequestException,
@@ -11,6 +12,7 @@ import {
   Controller,
   HttpCode,
   HttpStatus,
+  Patch,
   Post,
   Req,
   UseGuards,
@@ -44,10 +46,10 @@ export class BlogController {
   @ApiOperation({ summary: 'Create Category' })
   @ApiCreatedResponse({})
   async createCategory(
-    @Body() categoryDto: CategoryDto,
+    @Body() createCategoryDto: CreateCategoryDto,
   ): Promise<CategorySerializer> {
     const { category, errMessage } = await this.blogService.createCategory(
-      categoryDto,
+      createCategoryDto,
     );
 
     if (errMessage) {
@@ -59,6 +61,32 @@ export class BlogController {
       HttpStatus.CREATED,
       'SUCCESS',
       'Category successfully created',
+      category.toObject(),
+      [],
+    );
+  }
+
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Patch('category/update')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update Category' })
+  @ApiCreatedResponse({})
+  async updateCategory(
+    @Body() updateCategoryDto: UpdateCategoryDto,
+  ): Promise<CategorySerializer> {
+    const { category, errMessage } = await this.blogService.updateCategory(
+      updateCategoryDto,
+    );
+
+    if (errMessage) {
+      this.loggerService.error(errMessage, 'blog.handler.updateCategory');
+      throw new BadRequestException(errMessage);
+    }
+
+    return new CategorySerializer(
+      HttpStatus.CREATED,
+      'SUCCESS',
+      'Category successfully updated',
       category.toObject(),
       [],
     );

@@ -1,4 +1,4 @@
-version: "3.7"
+version: '3.7'
 services:
   web:
     container_name: userBlogService
@@ -9,31 +9,33 @@ services:
       - db
       - mq
     ports:
-      - "3000:3000"
+      - '3000:3000'
     volumes:
       - .:/server
     environment:
       RABBITMQ_URI: amqp://root:root@mq:5672
       RABBITMQ_QUEUE: blog_queue
       MONGO_URI: mongodb://db:27017/userBlog
+      JWT_SECRET: JwtSecretTokenWillBeHere
+      JWT_EXPIRATION: 8h
       PORT: 3000
 
-# Database
+  # Database
   db:
     container_name: userBlogServiceMongo
     image: mongo
     ports:
-      - "27017:27017"
+      - '27017:27017'
     restart: always
 
-# Message Queue Server
+  # Message Queue Server
   mq:
     container_name: userBlogServiceRabbitMQ
     image: rabbitmq:3.6-management-alpine
     environment:
-        RABBITMQ_ERLANG_COOKIE: ${RABBITMQ_ERLANG_COOKIE}
-        RABBITMQ_DEFAULT_USER: root
-        RABBITMQ_DEFAULT_PASS: root
+      RABBITMQ_ERLANG_COOKIE: ${RABBITMQ_ERLANG_COOKIE}
+      RABBITMQ_DEFAULT_USER: root
+      RABBITMQ_DEFAULT_PASS: root
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - '5672:5672'
+      - '15672:15672'
