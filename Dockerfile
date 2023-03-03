@@ -5,7 +5,7 @@ FROM node:12-alpine AS builder
 # Define working directory and copy source
 WORKDIR /home/node/app
 COPY . .
-# Install dependencies and build whatever you have to build 
+# Install dependencies and build whatever you have to build
 # (babel, grunt, webpack, etc.)
 RUN yarn install && yarn run build
 
@@ -25,10 +25,10 @@ COPY --from=builder /home/node/app/package* /home/node/app/yarn.lock ./
 
 RUN yarn install && yarn cache clean --force
 # Copy builded source from the upper builder stage
-COPY --from=builder /home/node/app/dist .
+COPY --from=builder /home/node/app/dist ./dist
 
 # Expose ports (for orchestrators and dynamic reverse proxies)
 EXPOSE ${PORT}
 
 # Start the app
-CMD ["node", "server.js"]
+CMD ["yarn", "start:prod"]
