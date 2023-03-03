@@ -1,6 +1,6 @@
 # Step 1 : Builder image
 #
-FROM node:12-alpine AS builder
+FROM node:14-alpine AS builder
 
 # Define working directory and copy source
 WORKDIR /home/node/app
@@ -12,7 +12,7 @@ RUN yarn install && yarn run build
 ###############################################################################
 # Step 2 : Run image
 #
-FROM node:12-alpine
+FROM node:14-alpine
 
 # Taking PORT from argument
 ARG PORT

@@ -1,5 +1,5 @@
 # Development image not for production
-FROM node:12-slim
+FROM node:14-slim
 
 WORKDIR /server
 
