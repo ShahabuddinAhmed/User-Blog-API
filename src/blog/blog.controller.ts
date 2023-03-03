@@ -1,3 +1,4 @@
+import { JwtAuthGuard } from './../user/guards/jwt-auth.guard';
 import { CommentSerializer } from './serializer/comment.serializer';
 import { CommentDto } from './dto/comment.dto';
 import { CategorySerializer } from './serializer/category.serializer';
@@ -12,15 +13,23 @@ import {
   HttpStatus,
   Post,
   Req,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { BlogService } from './blog.service';
-import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ArticleDto } from './dto/article.dto';
 import { ArticleSerializer } from './serializer/article.serializer';
 import { LikeDto } from './dto/like.dto';
 import { LikeSerializer } from './serializer/like.serializer';
 
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 @ApiTags('Blog')
 @Controller('blog')
 export class BlogController {
@@ -50,7 +59,7 @@ export class BlogController {
       HttpStatus.CREATED,
       'SUCCESS',
       'Category successfully created',
-      category,
+      category.toObject(),
       [],
     );
   }
@@ -78,7 +87,7 @@ export class BlogController {
       HttpStatus.CREATED,
       'SUCCESS',
       'Article successfully created',
-      article,
+      article.toObject(),
       [],
     );
   }
@@ -106,7 +115,7 @@ export class BlogController {
       HttpStatus.CREATED,
       'SUCCESS',
       'Comment successfully created',
-      comment,
+      comment.toObject(),
       [],
     );
   }
@@ -131,7 +140,7 @@ export class BlogController {
       HttpStatus.CREATED,
       'SUCCESS',
       'Like successfully created',
-      like,
+      like.toObject(),
       [],
     );
   }

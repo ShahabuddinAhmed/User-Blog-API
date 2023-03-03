@@ -1,13 +1,19 @@
-import { Exclude, plainToClass } from 'class-transformer';
+import { Exclude, plainToClass, Type } from 'class-transformer';
 import { AppSerializer } from '../../app.serializer';
 import { CommentDocument } from '../schemas/Comment.schema';
 
 class Comment {
+  @Type(() => String)
+  _id: string;
+
+  @Type(() => String)
+  parent: string;
+
   name: string;
   slug: string;
 
   @Exclude()
-  _id: string;
+  user: string;
 
   @Exclude()
   createdAt: string;
