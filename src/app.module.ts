@@ -21,6 +21,7 @@ import { BlogModule } from './blog/blog.module';
     UserModule,
     BlogModule,
   ],
+  exports: [LoggerModule],
   controllers: [AppController],
   providers: [AppService],
 })

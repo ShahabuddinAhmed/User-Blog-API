@@ -19,7 +19,7 @@ export class Article {
   @Prop({ required: true, unique: true, trim: true })
   slug: string;
 
-  @Prop({ required: true, type: Text })
+  @Prop({ required: true, type: String })
   content: string;
 
   @Prop({ type: Types.ObjectId, ref: 'Category' })
