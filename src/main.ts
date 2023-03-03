@@ -20,7 +20,7 @@ async function bootstrap() {
       transport: Transport.RMQ,
       options: {
         urls: [process.env.RABBITMQ_URI],
-        queue: process.env.RABBITMQ_EMAIL_QUEUE,
+        queue: process.env.RABBITMQ_QUEUE,
         noAck: false,
         prefetchCount: 100, // prefetchCount is depends on server resource that can be server auto scele up
         queueOptions: {

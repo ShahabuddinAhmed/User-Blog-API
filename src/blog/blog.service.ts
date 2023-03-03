@@ -1,17 +1,18 @@
+import { MessageQueueService } from './../message-queue/message-queue.service';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { UserDocument } from 'src/user/schemas/user.schema';
-import { Category, CategoryDocument } from './schemas/category.schema';
-import { Article, ArticleDocument } from './schemas/article.schema';
-import { Like, LikeDocument } from './schemas/like.schema';
+import { CategoryDocument } from './schemas/category.schema';
+import { ArticleDocument } from './schemas/article.schema';
+import { LikeDocument } from './schemas/like.schema';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { LikeDto } from './dto/like.dto';
 import { JwtPayloadDto } from 'src/user/dto/jwt-payload.dto';
 import { ArticleDto } from './dto/article.dto';
 import { CommentDto } from './dto/comment.dto';
-import { Comment, CommentDocument } from './schemas/comment.schema';
+import { CommentDocument } from './schemas/comment.schema';
+import { EventPatternType } from 'src/utils/utils.enum';
 
 @Injectable()
 export class BlogService {
@@ -20,6 +21,7 @@ export class BlogService {
     @InjectModel('Article') private articleModel: Model<ArticleDocument>,
     @InjectModel('Like') private likeModel: Model<LikeDocument>,
     @InjectModel('Comment') private commentModel: Model<CommentDocument>,
+    private readonly messageQueueService: MessageQueueService,
   ) {}
 
   public async createCategory(
@@ -36,8 +38,14 @@ export class BlogService {
       };
     }
 
+    const createdCategory = await this.categoryModel.create(createCategoryDto);
+    await this.messageQueueService.publish(
+      EventPatternType.CREATED_CATEGORY,
+      createdCategory,
+    );
+
     return {
-      category: await this.categoryModel.create(createCategoryDto),
+      category: createdCategory,
       errMessage: '',
     };
   }
@@ -56,12 +64,19 @@ export class BlogService {
       };
     }
 
+    const updatedCategory = await this.categoryModel.findOneAndUpdate(
+      { _id: updateCategoryDto.categoryId },
+      updateCategoryDto,
+      { new: true },
+    );
+
+    await this.messageQueueService.publish(
+      EventPatternType.UPDATED_CATEGORY,
+      updatedCategory,
+    );
+
     return {
-      category: await this.categoryModel.findOneAndUpdate(
-        { _id: updateCategoryDto.categoryId },
-        updateCategoryDto,
-        { new: true },
-      ),
+      category: updatedCategory,
       errMessage: '',
     };
   }

@@ -1,3 +1,5 @@
+import { MessageQueueModule } from './../message-queue/message-queue.module';
+import { MessageQueueService } from './../message-queue/message-queue.service';
 import { Module } from '@nestjs/common';
 import { BlogService } from './blog.service';
 import { BlogController } from './blog.controller';
@@ -31,8 +33,9 @@ import { LikeSchema } from './schemas/like.schema';
         schema: LikeSchema,
       },
     ]),
+    MessageQueueModule,
   ],
-  providers: [BlogService],
+  providers: [BlogService, MessageQueueService],
   controllers: [BlogController],
 })
 export class BlogModule {}
