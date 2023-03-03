@@ -18,6 +18,7 @@ import {
   ApiOkResponse,
   ApiTags,
   ApiOperation,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { LoggerService } from '../logger/logger.service';
@@ -29,6 +30,7 @@ import { Request } from 'express';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
+@ApiTags('User')
 @Controller('user')
 export class UserController {
   constructor(
@@ -96,6 +98,7 @@ export class UserController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Patch('update')
   @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update User' })
   @ApiOkResponse({})
   async update(
