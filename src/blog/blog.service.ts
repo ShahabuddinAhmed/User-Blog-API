@@ -110,10 +110,17 @@ export class BlogService {
     }
 
     return {
-      like: await this.likeModel.create({
-        ...likeDto,
-        user: jwtPayloadDto.userId,
-      }),
+      like: await this.likeModel.findOneAndUpdate(
+        {
+          user: jwtPayloadDto.userId,
+          article: likeDto.article,
+        },
+        {
+          ...likeDto,
+          user: jwtPayloadDto.userId,
+        },
+        { upsert: true, new: true },
+      ),
       errMessage: '',
     };
   }
