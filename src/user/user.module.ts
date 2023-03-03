@@ -30,5 +30,15 @@ import { UserSchema } from './schemas/user.schema';
   ],
   providers: [UserService, JwtStrategy],
   controllers: [UserController],
+  exports: [
+    UserService,
+    MongooseModule.forFeature([
+      {
+        name: 'User',
+        collection: 'user',
+        schema: UserSchema,
+      },
+    ]),
+  ],
 })
 export class UserModule {}

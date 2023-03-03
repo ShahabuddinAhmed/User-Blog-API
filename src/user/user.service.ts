@@ -15,7 +15,7 @@ import { Request } from 'express';
 export class UserService {
   constructor(
     private readonly jwtService: JwtService,
-    @InjectModel('User') private userModel: Model<UserDocument>, // private readonly loggerService: LoggerService,
+    @InjectModel('User') private userModel: Model<UserDocument>,
   ) {}
 
   async register(
