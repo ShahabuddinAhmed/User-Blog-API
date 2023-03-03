@@ -1,13 +1,12 @@
-import { Exclude, plainToClass } from 'class-transformer';
+import { Exclude, plainToClass, Type } from 'class-transformer';
 import { AppSerializer } from '../../app.serializer';
 import { CategoryDocument } from '../schemas/category.schema';
 
 class Category {
+  @Type(() => String)
+  _id: string;
   name: string;
   slug: string;
-
-  @Exclude()
-  _id: string;
 
   @Exclude()
   createdAt: string;

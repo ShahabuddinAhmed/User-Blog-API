@@ -1,15 +1,17 @@
 import { ArticleDocument } from './../schemas/article.schema';
-import { Exclude, plainToClass } from 'class-transformer';
+import { Exclude, plainToClass, Type } from 'class-transformer';
 import { AppSerializer } from '../../app.serializer';
 
 class Article {
+  @Type(() => String)
+  _id: string;
   title: string;
   subTitle: string;
   slug: string;
   content: string;
 
   @Exclude()
-  _id: string;
+  user: string;
 
   @Exclude()
   createdAt: string;

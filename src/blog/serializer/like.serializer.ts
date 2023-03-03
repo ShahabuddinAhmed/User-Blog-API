@@ -1,13 +1,15 @@
 import { LikeDocument } from './../schemas/like.schema';
-import { Exclude, plainToClass } from 'class-transformer';
+import { Exclude, plainToClass, Type } from 'class-transformer';
 import { AppSerializer } from '../../app.serializer';
 
 class Like {
+  @Type(() => String)
+  _id: string;
   isLike: boolean;
   article: string;
 
   @Exclude()
-  _id: string;
+  user: string;
 
   @Exclude()
   createdAt: string;

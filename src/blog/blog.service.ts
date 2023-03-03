@@ -127,6 +127,6 @@ export class BlogService {
   private async getCategoryById(
     categoryId: string,
   ): Promise<CategoryDocument | null> {
-    return this.articleModel.findById({ _id: categoryId });
+    return this.categoryModel.findById({ _id: categoryId });
   }
 }

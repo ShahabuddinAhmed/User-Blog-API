@@ -11,7 +11,7 @@ export type CommentDocument = Comment & Document;
 })
 export class Comment {
   @Prop({ required: true, type: String, index: 'text', trim: true })
-  name: string;
+  content: string;
 
   @Prop({ type: Types.ObjectId, required: true })
   parent: string;
