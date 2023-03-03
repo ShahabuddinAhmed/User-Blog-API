@@ -18,6 +18,8 @@ import { BlogService } from './blog.service';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ArticleDto } from './dto/article.dto';
 import { ArticleSerializer } from './serializer/article.serializer';
+import { LikeDto } from './dto/like.dto';
+import { LikeSerializer } from './serializer/like.serializer';
 
 @ApiTags('Blog')
 @Controller('blog')
@@ -82,7 +84,7 @@ export class BlogController {
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
-  @Post('article/create')
+  @Post('article/leaveComment')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create article' })
   @ApiCreatedResponse({})
@@ -105,6 +107,31 @@ export class BlogController {
       'SUCCESS',
       'Comment successfully created',
       comment,
+      [],
+    );
+  }
+
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Post('article/addLike')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Create article' })
+  @ApiCreatedResponse({})
+  async addLike(@Req() req, @Body() likeDto: LikeDto): Promise<LikeSerializer> {
+    const { like, errMessage } = await this.blogService.addLike(
+      likeDto,
+      req.user,
+    );
+
+    if (errMessage) {
+      this.loggerService.error(errMessage, 'blog.handler.addLike');
+      throw new BadRequestException(errMessage);
+    }
+
+    return new LikeSerializer(
+      HttpStatus.CREATED,
+      'SUCCESS',
+      'Like successfully created',
+      like,
       [],
     );
   }
