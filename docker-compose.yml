@@ -22,6 +22,7 @@ services:
       JWT_EXPIRATION: 8h
       ELASTIC_SEARCH_NODE: http://elasticsearch:9200
       INDICES: blog_category
+      REDIS_URL: redis://userBlogServiceRedis:6379
       PORT: 3000
 
   # Database
@@ -43,6 +44,17 @@ services:
     ports:
       - '5672:5672'
       - '15672:15672'
+
+  # Redis Server
+  redisCache:
+    container_name: userBlogServiceRedis
+    image: redis:alpine
+    environment:
+      FLASK_ENV: development
+    ports:
+      - '6379:6379'
+    volumes:
+      - ./config/redis.conf:/redis.conf
 
   # ElasticSearch
   elasticsearch:
