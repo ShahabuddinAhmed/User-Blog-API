@@ -8,6 +8,8 @@ services:
     depends_on:
       - db
       - mq
+      - elasticsearch
+      - kibana
     ports:
       - '3000:3000'
     volumes:
@@ -18,6 +20,8 @@ services:
       MONGO_URI: mongodb://db:27017/userBlog
       JWT_SECRET: JwtSecretTokenWillBeHere
       JWT_EXPIRATION: 8h
+      ELASTIC_SEARCH_NODE: http://elasticsearch:9200
+      INDICES: blog_category
       PORT: 3000
 
   # Database
@@ -39,3 +43,49 @@ services:
     ports:
       - '5672:5672'
       - '15672:15672'
+
+  # ElasticSearch
+  elasticsearch:
+    container_name: userBlogServiceElasticSearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.4
+    environment:
+      - cluster.name=es-docker-cluster
+      - bootstrap.memory_lock=true
+      - 'ES_JAVA_OPTS=-Xms2G -Xmx2G'
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+    volumes:
+      - data:/usr/share/elasticsearch/data
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - '9200:9200'
+    expose:
+      - '9200'
+    networks:
+      - elastic
+
+  # Kibana
+  kibana:
+    container_name: userBlogServiceKibana
+    depends_on:
+      - elasticsearch
+    image: docker.elastic.co/kibana/kibana:6.8.4
+    volumes:
+      - ./kibana.yml:/usr/share/kibana/config/kibana.yml
+    ports:
+      - '5601:5601'
+    expose:
+      - '5601'
+    networks:
+      - elastic
+
+volumes:
+  data:
+    driver: local
+
+networks:
+  elastic:
+    driver: bridge

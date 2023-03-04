@@ -8,6 +8,7 @@ import { HelperModule } from './helper/helper.module';
 import { UserModule } from './user/user.module';
 import { BlogModule } from './blog/blog.module';
 import { MessageQueueModule } from './message-queue/message-queue.module';
+import { ElasticSearchModule } from './elastic-search/elastic-search.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { MessageQueueModule } from './message-queue/message-queue.module';
     UserModule,
     BlogModule,
     MessageQueueModule,
+    ElasticSearchModule,
   ],
   exports: [LoggerModule],
   controllers: [AppController],
