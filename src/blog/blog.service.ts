@@ -1,3 +1,4 @@
+import { RedisClientService } from './../redis-client/redis-client.service';
 import { ElasticSearchService } from './../elastic-search/elastic-search.service';
 import { MessageQueueService } from './../message-queue/message-queue.service';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -25,6 +26,7 @@ export class BlogService {
     @InjectModel('Comment') private commentModel: Model<CommentDocument>,
     private readonly messageQueueService: MessageQueueService,
     private readonly elasticSearchService: ElasticSearchService,
+    private readonly redisClientService: RedisClientService,
   ) {}
 
   public async createCategory(
@@ -162,6 +164,13 @@ export class BlogService {
     article: ArticleDocument | null;
     errMessage: string;
   }> {
+    const checkCache = await this.redisClientService.redisCache.get(articleId);
+    if (checkCache) {
+      return {
+        article: checkCache,
+        errMessage: '',
+      };
+    }
     const checkArticle = await this.articleModel
       .findById({ _id: articleId })
       .lean();
@@ -172,6 +181,9 @@ export class BlogService {
         errMessage: 'Please provide valid articleId',
       };
     }
+
+    await this.redisClientService.redisCache.set(articleId, checkArticle);
+
     return {
       article: checkArticle,
       errMessage: '',

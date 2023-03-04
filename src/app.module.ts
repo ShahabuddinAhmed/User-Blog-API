@@ -9,6 +9,7 @@ import { UserModule } from './user/user.module';
 import { BlogModule } from './blog/blog.module';
 import { MessageQueueModule } from './message-queue/message-queue.module';
 import { ElasticSearchModule } from './elastic-search/elastic-search.module';
+import { RedisClientModule } from './redis-client/redis-client.module';
 
 @Module({
   imports: [
@@ -24,8 +25,9 @@ import { ElasticSearchModule } from './elastic-search/elastic-search.module';
     BlogModule,
     MessageQueueModule,
     ElasticSearchModule,
+    RedisClientModule,
   ],
-  exports: [LoggerModule],
+  exports: [LoggerModule, RedisClientModule],
   controllers: [AppController],
   providers: [AppService],
 })
