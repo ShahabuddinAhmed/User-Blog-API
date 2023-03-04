@@ -139,6 +139,45 @@ export class BlogService {
     };
   }
 
+  public async listArticle(
+    offset: number,
+    limit: number,
+  ): Promise<{
+    articles: ArticleDocument[];
+    count: number;
+    errMessage: string;
+  }> {
+    return {
+      articles: await this.articleModel
+        .find({}, ['title', 'subTitle', 'slug', 'category'])
+        .skip(offset)
+        .limit(limit)
+        .lean(),
+      count: await this.articleModel.count(),
+      errMessage: '',
+    };
+  }
+
+  public async detailArticle(articleId: string): Promise<{
+    article: ArticleDocument | null;
+    errMessage: string;
+  }> {
+    const checkArticle = await this.articleModel
+      .findById({ _id: articleId })
+      .lean();
+
+    if (!checkArticle) {
+      return {
+        article: null,
+        errMessage: 'Please provide valid articleId',
+      };
+    }
+    return {
+      article: checkArticle,
+      errMessage: '',
+    };
+  }
+
   public async leaveComment(
     commentDto: CommentDto,
     jwtPayloadDto: JwtPayloadDto,
@@ -172,6 +211,25 @@ export class BlogService {
         user: jwtPayloadDto.userId,
       }),
       errMessage: '',
+    };
+  }
+
+  public async listComment(
+    offset: number,
+    limit: number,
+    article: string,
+  ): Promise<{
+    comments: CommentDocument[];
+    count: number;
+  }> {
+    return {
+      comments: await this.commentModel
+        .find({ article })
+        .populate('user', ['firstName', 'lastName'])
+        .skip(offset)
+        .limit(limit)
+        .lean(),
+      count: await this.commentModel.count({ article }),
     };
   }
 

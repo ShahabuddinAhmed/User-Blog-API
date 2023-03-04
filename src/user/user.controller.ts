@@ -1,3 +1,6 @@
+import { ListLikeSerializer } from './serializer/list-like.serializer';
+import { HelperService } from './../helper/helper.service';
+import { PaginationDto } from './../blog/dto/pagination.dto';
 import { UpdateUserSerializer } from './serializer/update-user.serializer';
 import {
   Controller,
@@ -12,6 +15,8 @@ import {
   BadRequestException,
   UseGuards,
   Patch,
+  Get,
+  Query,
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
@@ -36,6 +41,7 @@ export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly loggerService: LoggerService,
+    private readonly helperService: HelperService,
   ) {}
 
   @UseInterceptors(ClassSerializerInterceptor)
@@ -112,6 +118,37 @@ export class UserController {
       'User successfully updated',
       user.toObject(),
       [],
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get('like/list')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'List user like' })
+  @ApiCreatedResponse({})
+  async listArticle(
+    @Req() req,
+    @Query() paginationDto: PaginationDto,
+  ): Promise<ListLikeSerializer> {
+    const { offset, limit } = await this.helperService.offsetLimitParser(
+      paginationDto.offset,
+      paginationDto.limit,
+    );
+
+    const { likes, count } = await this.userService.listLike(
+      offset,
+      limit,
+      req.user,
+    );
+
+    return new ListLikeSerializer(
+      HttpStatus.OK,
+      'SUCCESS',
+      'Like list',
+      likes,
+      [],
+      { offset, limit, count },
     );
   }
 }

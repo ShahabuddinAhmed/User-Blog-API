@@ -1,3 +1,8 @@
+import { ListCommentSerializer } from './serializer/list-comment.serializer';
+import { ListCommentDto } from './dto/list-comment.dto';
+import { DetailArticleDto } from './dto/detail-article.dto';
+import { ListArticleSerializer } from './serializer/list-article.serializer';
+import { PaginationDto } from './dto/pagination.dto';
 import { SearchCategorySerializer } from './serializer/search-category.serializer';
 import { HelperService } from './../helper/helper.service';
 import { SearchCategoryDto } from './dto/search-category.dto';
@@ -116,7 +121,7 @@ export class BlogController {
     }
 
     return new SearchCategorySerializer(
-      HttpStatus.CREATED,
+      HttpStatus.OK,
       'SUCCESS',
       'Category List',
       category,
@@ -153,6 +158,65 @@ export class BlogController {
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
+  @Get('article/list')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'List article' })
+  @ApiCreatedResponse({})
+  async listArticle(
+    @Query() paginationDto: PaginationDto,
+  ): Promise<ListArticleSerializer> {
+    const { offset, limit } = await this.helperService.offsetLimitParser(
+      paginationDto.offset,
+      paginationDto.limit,
+    );
+
+    const { articles, count, errMessage } = await this.blogService.listArticle(
+      offset,
+      limit,
+    );
+
+    if (errMessage) {
+      this.loggerService.error(errMessage, 'blog.handler.listArticle');
+      throw new BadRequestException(errMessage);
+    }
+
+    return new ListArticleSerializer(
+      HttpStatus.OK,
+      'SUCCESS',
+      'Article list',
+      articles,
+      [],
+      { offset, limit, count },
+    );
+  }
+
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get('article/detail')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Detail article' })
+  @ApiCreatedResponse({})
+  async detailArticle(
+    @Query() detailArticleDto: DetailArticleDto,
+  ): Promise<ArticleSerializer> {
+    const { article, errMessage } = await this.blogService.detailArticle(
+      detailArticleDto.article,
+    );
+
+    if (errMessage) {
+      this.loggerService.error(errMessage, 'blog.handler.detailArticle');
+      throw new BadRequestException(errMessage);
+    }
+
+    return new ArticleSerializer(
+      HttpStatus.OK,
+      'SUCCESS',
+      'Detail article',
+      article,
+      [],
+    );
+  }
+
+  @UseInterceptors(ClassSerializerInterceptor)
   @Post('article/leaveComment')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create article' })
@@ -177,6 +241,35 @@ export class BlogController {
       'Comment successfully created',
       comment.toObject(),
       [],
+    );
+  }
+
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get('article/listComment')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'List article' })
+  @ApiCreatedResponse({})
+  async listComment(
+    @Query() listCommentDto: ListCommentDto,
+  ): Promise<ListCommentSerializer> {
+    const { offset, limit } = await this.helperService.offsetLimitParser(
+      listCommentDto.offset,
+      listCommentDto.limit,
+    );
+
+    const { comments, count } = await this.blogService.listComment(
+      offset,
+      limit,
+      listCommentDto.article,
+    );
+
+    return new ListCommentSerializer(
+      HttpStatus.OK,
+      'SUCCESS',
+      'List comment',
+      comments,
+      [],
+      { offset, limit, count },
     );
   }
 

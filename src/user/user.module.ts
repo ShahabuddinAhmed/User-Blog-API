@@ -1,3 +1,4 @@
+import { LikeSchema } from './../blog/schemas/like.schema';
 import { Module } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
@@ -14,6 +15,11 @@ import { UserSchema } from './schemas/user.schema';
         name: 'User',
         collection: 'user',
         schema: UserSchema,
+      },
+      {
+        name: 'Like',
+        collection: 'like',
+        schema: LikeSchema,
       },
     ]),
     PassportModule.registerAsync({
@@ -32,13 +38,13 @@ import { UserSchema } from './schemas/user.schema';
   controllers: [UserController],
   exports: [
     UserService,
-    MongooseModule.forFeature([
-      {
-        name: 'User',
-        collection: 'user',
-        schema: UserSchema,
-      },
-    ]),
+    // MongooseModule.forFeature([
+    //   {
+    //     name: 'User',
+    //     collection: 'user',
+    //     schema: UserSchema,
+    //   },
+    // ]),
   ],
 })
 export class UserModule {}

@@ -1,3 +1,4 @@
+import { LikeDocument } from './../blog/schemas/like.schema';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -16,6 +17,7 @@ export class UserService {
   constructor(
     private readonly jwtService: JwtService,
     @InjectModel('User') private userModel: Model<UserDocument>,
+    @InjectModel('Like') private likeModel: Model<LikeDocument>,
   ) {}
 
   async register(
@@ -104,5 +106,24 @@ export class UserService {
       userAgent: req.headers['user-agent'],
     };
     return this.jwtService.signAsync(payload);
+  }
+
+  public async listLike(
+    offset: number,
+    limit: number,
+    jwtPayloadDto: JwtPayloadDto,
+  ): Promise<{
+    likes: LikeDocument[];
+    count: number;
+  }> {
+    return {
+      likes: await this.likeModel
+        .find({ user: jwtPayloadDto.userId })
+        .populate('article', ['title', 'subTitle', 'slug'])
+        .skip(offset)
+        .limit(limit)
+        .lean(),
+      count: await this.likeModel.count({ user: jwtPayloadDto.userId }),
+    };
   }
 }
