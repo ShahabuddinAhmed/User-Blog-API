@@ -1,3 +1,6 @@
+import { SearchCategorySerializer } from './serializer/search-category.serializer';
+import { HelperService } from './../helper/helper.service';
+import { SearchCategoryDto } from './dto/search-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { JwtAuthGuard } from './../user/guards/jwt-auth.guard';
 import { CommentSerializer } from './serializer/comment.serializer';
@@ -10,10 +13,12 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
   UseInterceptors,
@@ -38,6 +43,7 @@ export class BlogController {
   constructor(
     private readonly blogService: BlogService,
     private readonly loggerService: LoggerService,
+    private readonly helperService: HelperService,
   ) {}
 
   @UseInterceptors(ClassSerializerInterceptor)
@@ -88,6 +94,32 @@ export class BlogController {
       'SUCCESS',
       'Category successfully updated',
       category.toObject(),
+      [],
+    );
+  }
+
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get('category/search')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Search Category' })
+  @ApiCreatedResponse({})
+  async searchCategory(
+    @Query() searchCategoryDto: SearchCategoryDto,
+  ): Promise<SearchCategorySerializer> {
+    const { category, errMessage } = await this.blogService.searchCategory(
+      searchCategoryDto.name,
+    );
+
+    if (errMessage) {
+      this.loggerService.error(errMessage, 'blog.handler.searchCategory');
+      throw new BadRequestException(errMessage);
+    }
+
+    return new SearchCategorySerializer(
+      HttpStatus.CREATED,
+      'SUCCESS',
+      'Category List',
+      category,
       [],
     );
   }

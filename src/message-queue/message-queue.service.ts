@@ -20,7 +20,8 @@ export class MessageQueueService {
 
   public async createdCategoryEventHandler(data: CategoryDocument) {
     try {
-      await this.elasticSearchService.createOrUpdateCategory(data);
+      const response = await this.getCategory(data._id);
+      await this.elasticSearchService.createOrUpdateCategory(response);
     } catch (err) {
       console.log(err);
     }
@@ -28,9 +29,18 @@ export class MessageQueueService {
 
   public async updatedCategoryEventHandler(data: CategoryDocument) {
     try {
-      await this.elasticSearchService.createOrUpdateCategory(data);
+      const response = await this.getCategory(data._id);
+      await this.elasticSearchService.createOrUpdateCategory(response);
     } catch (err) {
       console.log(err);
     }
+  }
+
+  private async getCategory(
+    categoryId: string,
+  ): Promise<CategoryDocument | null> {
+    return this.categoryModel
+      .findById({ _id: categoryId })
+      .populate('articles');
   }
 }

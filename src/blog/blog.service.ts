@@ -1,7 +1,9 @@
+import { ElasticSearchService } from './../elastic-search/elastic-search.service';
 import { MessageQueueService } from './../message-queue/message-queue.service';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import esb from 'elastic-builder';
 import { Model, Types } from 'mongoose';
 import { CategoryDocument } from './schemas/category.schema';
 import { ArticleDocument } from './schemas/article.schema';
@@ -22,6 +24,7 @@ export class BlogService {
     @InjectModel('Like') private likeModel: Model<LikeDocument>,
     @InjectModel('Comment') private commentModel: Model<CommentDocument>,
     private readonly messageQueueService: MessageQueueService,
+    private readonly elasticSearchService: ElasticSearchService,
   ) {}
 
   public async createCategory(
@@ -77,6 +80,41 @@ export class BlogService {
 
     return {
       category: updatedCategory,
+      errMessage: '',
+    };
+  }
+
+  public async searchCategory(
+    name = '',
+  ): Promise<{ category: CategoryDocument[]; errMessage: string }> {
+    const query = esb
+      .requestBodySearch()
+      .query(
+        esb
+          .boolQuery()
+          .filter(
+            esb.boolQuery().should(esb.matchPhrasePrefixQuery('name', name)),
+          ),
+      );
+
+    const { body } =
+      await this.elasticSearchService.elasticsearchService.search({
+        index: process.env.INDICES,
+        body: query,
+      });
+
+    if (!body.hits.hits.length) {
+      return {
+        category: [],
+        errMessage: '',
+      };
+    }
+    const category = body.hits.hits.map((source) => {
+      return source._source;
+    });
+
+    return {
+      category,
       errMessage: '',
     };
   }
