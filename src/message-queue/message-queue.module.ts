@@ -1,3 +1,5 @@
+import { ElasticSearchModule } from './../elastic-search/elastic-search.module';
+import { ElasticSearchService } from './../elastic-search/elastic-search.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CategorySchema } from './../blog/schemas/category.schema';
 import { Module } from '@nestjs/common';
@@ -28,8 +30,9 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         schema: CategorySchema,
       },
     ]),
+    ElasticSearchModule,
   ],
-  providers: [MessageQueueService],
+  providers: [MessageQueueService, ElasticSearchService],
   controllers: [MessageQueueController],
   exports: [
     ClientsModule.register([

@@ -1,3 +1,5 @@
+import { ElasticSearchService } from './../elastic-search/elastic-search.service';
+import { ElasticSearchModule } from './../elastic-search/elastic-search.module';
 import { MessageQueueModule } from './../message-queue/message-queue.module';
 import { MessageQueueService } from './../message-queue/message-queue.service';
 import { Module } from '@nestjs/common';
@@ -34,8 +36,9 @@ import { LikeSchema } from './schemas/like.schema';
       },
     ]),
     MessageQueueModule,
+    ElasticSearchModule,
   ],
-  providers: [BlogService, MessageQueueService],
+  providers: [BlogService, MessageQueueService, ElasticSearchService],
   controllers: [BlogController],
 })
 export class BlogModule {}

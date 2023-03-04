@@ -1,3 +1,4 @@
+import { ElasticSearchService } from './../elastic-search/elastic-search.service';
 import { EventPatternType } from './../utils/utils.enum';
 import { CategoryDocument } from './../blog/schemas/category.schema';
 import { InjectModel } from '@nestjs/mongoose';
@@ -10,6 +11,7 @@ export class MessageQueueService {
   constructor(
     @Inject('MESSAGE_PUBLISHER') public client: ClientProxy,
     @InjectModel('Category') public categoryModel: Model<CategoryDocument>,
+    private readonly elasticSearchService: ElasticSearchService,
   ) {}
 
   public async publish(pattern: EventPatternType, data: any) {
@@ -17,10 +19,18 @@ export class MessageQueueService {
   }
 
   public async createdCategoryEventHandler(data: CategoryDocument) {
-    console.log(data);
+    try {
+      await this.elasticSearchService.createOrUpdateCategory(data);
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   public async updatedCategoryEventHandler(data: CategoryDocument) {
-    console.log(data);
+    try {
+      await this.elasticSearchService.createOrUpdateCategory(data);
+    } catch (err) {
+      console.log(err);
+    }
   }
 }
