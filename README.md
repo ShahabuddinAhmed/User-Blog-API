@@ -32,3 +32,11 @@ $ yarn run test:e2e
 # test coverage
 $ yarn run test:cov
 ```
+
+## Swagger UI Documentation
+
+[Swagger UI Docs](http://localhost:3000/api/v1/docs)
+
+## Kibana
+
+[Kibana](http://0.0.0.0:5601/)
